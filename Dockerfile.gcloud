@@ -1,0 +1,41 @@
+
+# Use Ubuntu 22.04 as base image
+FROM ubuntu:22.04
+
+# Set noninteractive mode for apt-get
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install basic packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    bash-completion \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add Google Cloud SDK repository and key
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+# Install Google Cloud SDK
+RUN apt-get update && apt-get install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin
+
+# Install kubectl (via gcloud)
+RUN gcloud components install kubectl --quiet || true
+
+# Install helm manually (latest stable)
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Set working directory to /workspace
+WORKDIR /workspace
+
+# Copy start script and cluster setup script
+COPY start.sh gke-setup.sh ./
+
+# Make scripts executable
+RUN chmod +x start.sh gke-setup.sh
+
+ENTRYPOINT ["./start.sh"]
