@@ -32,13 +32,14 @@ RUN mkdir -p /etc/apt/keyrings && \
 # Install helm manually (latest stable)
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+# Copy scripts to /usr/local/bin (system path)
+COPY start.sh gke-setup.sh /usr/local/bin/
+
+# Make scripts executable
+RUN chmod +x /usr/local/bin/start.sh /usr/local/bin/gke-setup.sh
+
 # Set working directory to /workspace
 WORKDIR /workspace
 
-# Copy start script and cluster setup script
-COPY start.sh gke-setup.sh ./
-
-# Make scripts executable
-RUN chmod +x start.sh gke-setup.sh
-
-ENTRYPOINT ["./start.sh"]
+# Use absolute path for entrypoint
+ENTRYPOINT ["/usr/local/bin/start.sh"]
