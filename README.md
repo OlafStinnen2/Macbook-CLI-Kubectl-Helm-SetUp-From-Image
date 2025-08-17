@@ -17,7 +17,7 @@ This project provides a Docker container with Google Cloud SDK, kubectl, and Hel
 ## Build the Docker Image
 
 ```bash
-docker build -t gcloud-tools:latest -f Dockerfile.gcloud .
+docker build --no-cache -t gcloud-tools:latest -f Dockerfile.gcloud .
 ```
 
 ---
